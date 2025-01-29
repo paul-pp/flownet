@@ -9,9 +9,7 @@ from tqdm import tqdm
 
 import torchvision.transforms as transforms
 import flow_transforms
-#from imageio import imread, imwrite
-import imageio.v2 as imageio
-
+from imageio import imread, imwrite
 import numpy as np
 from util import flow2rgb
 
@@ -24,6 +22,22 @@ parser = argparse.ArgumentParser(
     description="PyTorch FlowNet inference on a folder of img pairs",
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 )
+parser.add_argument(
+    "--cpu",
+    "-c",
+    action='store_true',
+    default="False",
+    help="if the option is put, use the cpu",
+)
+
+parser.add_argument(
+    "--gpu",
+    "-g",
+    action='store_true',
+    default="False",
+    help="if the option is put, use the gpu",
+)
+
 parser.add_argument(
     "data",
     metavar="DIR",
@@ -79,21 +93,20 @@ parser.add_argument(
     help="if set, will output invert flow (from 1 to 0) along with regular flow",
 )
 
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-
-if torch.cuda.is_available():
-    print("device ",device)
-
-device=torch.device("cpu")
-
-
 
 
 @torch.no_grad()
 def main():
     global args, save_path
     args = parser.parse_args()
+    
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
+    if(args.cpu==True) :
+        device=torch.device("cpu")
+    if (args.gpu==True) :
+        device = torch.device("cuda")
+    
     if args.output_value == "both":
         output_string = "raw output and RGB visualization"
     elif args.output_value == "raw":
@@ -122,14 +135,13 @@ def main():
     for ext in args.img_exts:
         test_files = data_dir.files("*1.{}".format(ext))
         for file in test_files:
-             
             img_pair = file.parent / (file.stem[:-1] + "2.{}".format(ext))
             if img_pair.is_file():
                 img_pairs.append([file, img_pair])
 
     print("{} samples found".format(len(img_pairs)))
     # create model
-    network_data = torch.load(args.pretrained, map_location=torch.device('cpu'))
+    network_data = torch.load(args.pretrained)
     print("=> using pre-trained model '{}'".format(network_data["arch"]))
     model = models.__dict__[network_data["arch"]](network_data).to(device)
     model.eval()
@@ -139,17 +151,9 @@ def main():
         args.div_flow = network_data["div_flow"]
 
     for img1_file, img2_file in tqdm(img_pairs):
-        # img1 = input_transform(imread(img1_file))
-        # img2 = input_transform(imread(img2_file))
-        # print(img1_file, img2_file)
-        # exit()
-        #ERREUR début tensor a (4) must match the size of tensor b (3) at non-singleton dimension 0
-        img1 = input_transform(imageio.imread(img1_file))
-        img2 = input_transform(imageio.imread(img2_file))
-        print(img1.shape)
 
-        #ERREUR fin tensor a (4) must match the size of tensor b (3) at non-singleton dimension 0
-      
+        img1 = input_transform(imread(img1_file))
+        img2 = input_transform(imread(img2_file))
         input_var = torch.cat([img1, img2]).unsqueeze(0)
 
         if args.bidirectional:
@@ -171,8 +175,7 @@ def main():
                     args.div_flow * flow_output, max_value=args.max_flow
                 )
                 to_save = (rgb_flow * 255).astype(np.uint8).transpose(1, 2, 0)
-                # imwrite(filename + ".png", to_save)
-                imageio.imwrite(filename + ".png", to_save)
+                imwrite(filename + ".png", to_save)
             if args.output_value in ["raw", "both"]:
                 # Make the flow map a HxWx2 array as in .flo files
                 to_save = (args.div_flow * flow_output).cpu().numpy().transpose(1, 2, 0)
