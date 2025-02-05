@@ -144,6 +144,9 @@ def main():
     # network_data = torch.load(args.pretrained)
     if(args.cpu==True) :
         network_data = torch.load(args.pretrained, map_location=torch.device('cpu'))
+    else : 
+        network_data = torch.load(args.pretrained)
+    
     print("=> using pre-trained model '{}'".format(network_data["arch"]))
     model = models.__dict__[network_data["arch"]](network_data).to(device)
     model.eval()
