@@ -9,9 +9,11 @@ from tqdm import tqdm
 
 import torchvision.transforms as transforms
 import flow_transforms
-from imageio import imread, imwrite
+# from imageio import imread, imwrite
+import imageio.v2 as imageio
 import numpy as np
 from util import flow2rgb
+from visu_vect import *
 
 model_names = sorted(
     name for name in models.__dict__ if name.islower() and not name.startswith("__")
@@ -97,6 +99,8 @@ parser.add_argument(
 
 @torch.no_grad()
 def main():
+    L=gen_noyau_lissage(6)
+    facteur=8
     global args, save_path
     args = parser.parse_args()
     
@@ -121,7 +125,9 @@ def main():
     else:
         save_path = Path(args.output)
     print("=> will save everything to {}".format(save_path))
+    path_vectors=save_path/ "vectors"
     save_path.makedirs_p()
+    path_vectors.makedirs_p()
     # Data loading code
     input_transform = transforms.Compose(
         [
@@ -156,9 +162,8 @@ def main():
         args.div_flow = network_data["div_flow"]
 
     for img1_file, img2_file in tqdm(img_pairs):
-
-        img1 = input_transform(imread(img1_file))
-        img2 = input_transform(imread(img2_file))
+        img1 = input_transform(imageio.imread(img1_file))
+        img2 = input_transform(imageio.imread(img2_file))
         input_var = torch.cat([img1, img2]).unsqueeze(0)
 
         if args.bidirectional:
@@ -175,16 +180,20 @@ def main():
             )
         for suffix, flow_output in zip(["flow", "inv_flow"], output):
             filename = save_path / "{}{}".format(img1_file.stem[:-1], suffix)
+            filename2 = save_path /"vectors"/"{}{}".format(img1_file.stem[:-1], suffix)
             if args.output_value in ["vis", "both"]:
                 rgb_flow = flow2rgb(
                     args.div_flow * flow_output, max_value=args.max_flow
                 )
                 to_save = (rgb_flow * 255).astype(np.uint8).transpose(1, 2, 0)
-                imwrite(filename + ".png", to_save)
-            if args.output_value in ["raw", "both"]:
-                # Make the flow map a HxWx2 array as in .flo files
-                to_save = (args.div_flow * flow_output).cpu().numpy().transpose(1, 2, 0)
-                np.save(filename + ".npy", to_save)
+                imageio.imwrite(filename + ".png", to_save)
+                create_im_vect(img1_file,filename2+".png",flow_output,L,facteur)
+            print(img1_file[-1])
+        
+            # if args.output_value in ["raw", "both"]:
+            #     # Make the flow map a HxWx2 array as in .flo files
+            #     to_save = (args.div_flow * flow_output).cpu().numpy().transpose(1, 2, 0)
+            #     np.save(filename + ".npy", to_save)
 
 
 if __name__ == "__main__":
