@@ -41,6 +41,22 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--arrow_size",
+    "-a",
+    default=7,
+    type=int,
+    help="value by which flow will be divided. overwritten if stored in pretrained file",
+)
+
+parser.add_argument(
+    "--segmentation_arrow",
+    "-s",
+    default=6,
+    type=int,
+    help="value by which flow will be divided. overwritten if stored in pretrained file",
+)
+
+parser.add_argument(
     "data",
     metavar="DIR",
     help="path to images folder, image names must match '[name]0.[ext]' and '[name]1.[ext]'",
@@ -99,10 +115,12 @@ parser.add_argument(
 
 @torch.no_grad()
 def main():
-    L=gen_noyau_lissage(6)
-    facteur=8
     global args, save_path
     args = parser.parse_args()
+
+    L=gen_noyau_lissage(args.segmentation_arrow)
+    facteur=args.arrow_size
+
     
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 

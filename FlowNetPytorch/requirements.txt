@@ -8,3 +8,4 @@ argparse
 path
 tqdm
 scipy
+opencv-python
