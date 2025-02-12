@@ -41,11 +41,19 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--vectors",
+    action='store_true',
+    default="False",
+    help="if the option is put, generate vector images",
+)
+
+
+parser.add_argument(
     "--arrow_size",
     "-a",
     default=7,
     type=int,
-    help="value by which flow will be divided. overwritten if stored in pretrained file",
+    help="size of the arrows for the vector images",
 )
 
 parser.add_argument(
@@ -53,8 +61,9 @@ parser.add_argument(
     "-s",
     default=6,
     type=int,
-    help="value by which flow will be divided. overwritten if stored in pretrained file",
+    help="space between the arrows for the vector images",
 )
+
 
 parser.add_argument(
     "data",
@@ -118,8 +127,9 @@ def main():
     global args, save_path
     args = parser.parse_args()
 
-    L=gen_noyau_lissage(args.segmentation_arrow)
-    facteur=args.arrow_size
+    if (args.vectors==True):
+        L=gen_noyau_lissage(args.segmentation_arrow)
+        facteur=args.arrow_size
 
     
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -145,7 +155,8 @@ def main():
     print("=> will save everything to {}".format(save_path))
     path_vectors=save_path/ "vectors"
     save_path.makedirs_p()
-    path_vectors.makedirs_p()
+    if (args.vectors==True):
+        path_vectors.makedirs_p()
     # Data loading code
     input_transform = transforms.Compose(
         [
@@ -205,8 +216,9 @@ def main():
                 )
                 to_save = (rgb_flow * 255).astype(np.uint8).transpose(1, 2, 0)
                 imageio.imwrite(filename + ".png", to_save)
-                create_im_vect(img1_file,filename2+".png",flow_output,L,facteur)
-            print(img1_file[-1])
+                if (args.vectors==True):
+                    create_im_vect(img1_file,filename2+".png",flow_output,L,facteur)
+            # print(img1_file[-1])
         
             # if args.output_value in ["raw", "both"]:
             #     # Make the flow map a HxWx2 array as in .flo files
