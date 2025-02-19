@@ -48,22 +48,6 @@ parser.add_argument(
 )
 
 
-parser.add_argument(
-    "--arrow_size",
-    "-a",
-    default=7,
-    type=int,
-    help="size of the arrows for the vector images",
-)
-
-parser.add_argument(
-    "--segmentation_arrow",
-    "-s",
-    default=6,
-    type=int,
-    help="space between the arrows for the vector images",
-)
-
 
 parser.add_argument(
     "data",
@@ -220,10 +204,10 @@ def main():
                     create_im_vect(img1_file,filename2+".png",flow_output,L,facteur)
             # print(img1_file[-1])
         
-            # if args.output_value in ["raw", "both"]:
-            #     # Make the flow map a HxWx2 array as in .flo files
-            #     to_save = (args.div_flow * flow_output).cpu().numpy().transpose(1, 2, 0)
-            #     np.save(filename + ".npy", to_save)
+            if args.output_value in ["raw", "both"]:
+                # Make the flow map a HxWx2 array as in .flo files
+                to_save = (args.div_flow * flow_output).cpu().numpy().transpose(1, 2, 0)
+                np.save(filename + ".npy", to_save)
 
 
 if __name__ == "__main__":
