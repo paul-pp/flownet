@@ -40,12 +40,12 @@ parser.add_argument(
     help="if the option is put, use the gpu",
 )
 
-parser.add_argument(
-    "--vectors",
-    action='store_true',
-    default="False",
-    help="if the option is put, generate vector images",
-)
+# parser.add_argument(
+#     "--vectors",
+#     action='store_true',
+#     default="False",
+#     help="if the option is put, generate vector images",
+# )
 
 
 
@@ -111,9 +111,9 @@ def main():
     global args, save_path
     args = parser.parse_args()
 
-    if (args.vectors==True):
-        L=gen_noyau_lissage(args.segmentation_arrow)
-        facteur=args.arrow_size
+    # if (args.vectors==True):
+    #     L=gen_noyau_lissage(args.segmentation_arrow)
+    #     facteur=args.arrow_size
 
     
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -137,10 +137,9 @@ def main():
     else:
         save_path = Path(args.output)
     print("=> will save everything to {}".format(save_path))
-    path_vectors=save_path/ "vectors"
+    path_rgb_viz=save_path/ "rgb_viz"
     save_path.makedirs_p()
-    if (args.vectors==True):
-        path_vectors.makedirs_p()
+    path_rgb_viz.makedirs_p()
     # Data loading code
     input_transform = transforms.Compose(
         [
@@ -193,15 +192,15 @@ def main():
             )
         for suffix, flow_output in zip(["flow", "inv_flow"], output):
             filename = save_path / "{}{}".format(img1_file.stem[:-1], suffix)
-            filename2 = save_path /"vectors"/"{}{}".format(img1_file.stem[:-1], suffix)
+            filename2 = save_path /"rgb_viz"/"{}{}".format(img1_file.stem[:-1], suffix)
             if args.output_value in ["vis", "both"]:
                 rgb_flow = flow2rgb(
                     args.div_flow * flow_output, max_value=args.max_flow
                 )
                 to_save = (rgb_flow * 255).astype(np.uint8).transpose(1, 2, 0)
-                imageio.imwrite(filename + ".png", to_save)
-                if (args.vectors==True):
-                    create_im_vect(img1_file,filename2+".png",flow_output,L,facteur)
+                imageio.imwrite(filename2 + ".png", to_save)
+                # if (args.vectors==True):
+                #     create_im_vect(img1_file,filename2+".png",flow_output,L,facteur)
             # print(img1_file[-1])
         
             if args.output_value in ["raw", "both"]:
