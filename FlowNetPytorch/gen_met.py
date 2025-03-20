@@ -92,12 +92,12 @@ def genere_data(dataset,nb_pair_frames,ranger,selec):
     for k in range (nb_pair_frames):
         w=1024
         h=436
-        padding_x=100
-        padding_y=100
+        padding_x=40
+        padding_y=40
         pos_x=random.randint(padding_x,w-padding_x)
         pos_y=random.randint(padding_y,h-padding_y)
         teta=random.randint(0,360)
-        deplacement=random.randint(10,20)
+        deplacement=random.randint(4,10)
         deplacement_x=int(np.cos(teta*np.pi/180)*deplacement)
         deplacement_y=int(np.sin(teta*np.pi/180)*deplacement)
         met=random.randint(1,51)
@@ -111,11 +111,21 @@ def genere_data(dataset,nb_pair_frames,ranger,selec):
         # im_bg=cv2.imread(f'/Users/paul/Documents/MAIN4/Meteorix/gene_met/im_met/bg/output{bg}.png')
         im_bg=cv2.imread(f'bg/output{bg}.png')
 
-        deplacement_bg=random.randint(1,5)
+        random_bg=random.randint(1,10)
+        if (random_bg<=2):
+            deplacement_bg=0
+        if (3<=random_bg<=4):
+            deplacement_bg=1
+        if (5<=random_bg):
+            deplacement_bg=2
+
+
         teta_bg=random.randint(0,360)
 
         deplacement_bg_x=int(np.cos(teta_bg*np.pi/180)*deplacement_bg)
         deplacement_bg_y=int(np.sin(teta_bg*np.pi/180)*deplacement_bg)
+        print(deplacement_bg_x)
+        print(deplacement_bg_y)
         flow=np.zeros((h,w,2))
         for i in range(w):
             for j in range(h):
@@ -191,7 +201,7 @@ def main():
     global args, save_path
     args = parser.parse_args()
     print("génération de : ",args.nb_paires," paires")
-    genere_data("dataset_syn",args.nb_paires,0,51)
+    genere_data("dataset_syn",args.nb_paires,1,51)
     return(0)
 
 
