@@ -112,20 +112,24 @@ def genere_data(dataset,nb_pair_frames,ranger,selec):
         im_bg=cv2.imread(f'bg/output{bg}.png')
 
         random_bg=random.randint(1,10)
-        if (random_bg<=2):
+        if (random_bg<=4):
             deplacement_bg=0
-        if (3<=random_bg<=4):
-            deplacement_bg=1
-        if (5<=random_bg):
+        else:
             deplacement_bg=2
+        # if (3<=random_bg<=4):
+        #     deplacement_bg=1
+ 
 
+        # print("deplacement :",deplacement_bg)
+        
 
         teta_bg=random.randint(0,360)
+        # print(teta_bg)
 
         deplacement_bg_x=int(np.cos(teta_bg*np.pi/180)*deplacement_bg)
         deplacement_bg_y=int(np.sin(teta_bg*np.pi/180)*deplacement_bg)
-        print(deplacement_bg_x)
-        print(deplacement_bg_y)
+        # print(deplacement_bg_x)
+        # print(deplacement_bg_y)
         flow=np.zeros((h,w,2))
         for i in range(w):
             for j in range(h):
