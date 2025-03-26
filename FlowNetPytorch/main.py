@@ -320,7 +320,7 @@ def main():
             {
                 "epoch": epoch + 1,
                 "arch": args.arch,
-                "state_dict": model.module.state_dict(),
+                #"state_dict": model.module.state_dict(),
                 "best_EPE": best_EPE,
                 "div_flow": args.div_flow,
             },
