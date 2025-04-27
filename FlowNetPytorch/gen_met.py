@@ -101,7 +101,7 @@ def genere_data(dataset,nb_pair_frames,ranger,selec):
         deplacement_x=int(np.cos(teta*np.pi/180)*deplacement)
         deplacement_y=int(np.sin(teta*np.pi/180)*deplacement)
         met=random.randint(1,51)
-        bg=random.randint(0,275)
+        bg=random.randint(0,622)
         # im_met=cv2.imread(f'/Users/paul/Documents/MAIN4/Meteorix/gene_met/im_met/motif/met{met}.png')
         im_met=cv2.imread(f'motif/met{met}.png')
 
