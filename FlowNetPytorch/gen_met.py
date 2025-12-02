@@ -10,7 +10,6 @@ import argparse
 def coller_img1_sur_bg(img1,bg,pos):
     h, w, couleurs = img1.shape
     in_bounds=True
-    # print(h,w)
     for i in range(w):
         for j in range(h):
             if not np.array_equal(img1[j, i], [0, 0, 0]):
@@ -18,8 +17,6 @@ def coller_img1_sur_bg(img1,bg,pos):
                     bg[j+pos[1]-int(h/2),i+pos[0]+int(w/2)]=img1[j,i]
                 else :
                     in_bounds=False
-
-    # print("in_bounds:",in_bounds)
 
     return bg,in_bounds
 
@@ -36,7 +33,6 @@ def coller_img1_sur_bg2(img1,bg,pos,flow,deplacement_x,deplacement_y,deplacement
                     flow[j+pos[1]-int(h/2)][i+pos[0]+int(w/2)][1]+=deplacement_y
                 else : 
                     in_bounds=False
-    # print("in_bounds2:",in_bounds)
 
     return bg,flow,in_bounds
 
@@ -80,7 +76,7 @@ def write_flo(filename, flow):
 
 
 
-def genere_data(dataset,nb_pair_frames,ranger,selec):
+def genere_data(dataset,nb_pair_frames,ranger):
     if (ranger):
         path_clean=Path(dataset)/"clean"
         path_flow=Path(dataset)/"flow"
@@ -102,13 +98,8 @@ def genere_data(dataset,nb_pair_frames,ranger,selec):
         deplacement_y=int(np.sin(teta*np.pi/180)*deplacement)
         met=random.randint(1,51)
         bg=random.randint(0,622)
-        # im_met=cv2.imread(f'/Users/paul/Documents/MAIN4/Meteorix/gene_met/im_met/motif/met{met}.png')
+
         im_met=cv2.imread(f'motif/met{met}.png')
-
-        # im_met=cv2.imread(f'/Users/paul/Documents/MAIN4/Meteorix/gene_met/im_met/motif_taille/met.png')
-
-        # im_met=cv2.imread(f'/Users/paul/Documents/MAIN4/Meteorix/gene_met/im_met/motif_taille/met{selec}.png')
-        # im_bg=cv2.imread(f'/Users/paul/Documents/MAIN4/Meteorix/gene_met/im_met/bg/output{bg}.png')
         im_bg=cv2.imread(f'bg/output{bg}.png')
 
         random_bg=random.randint(1,10)
@@ -116,20 +107,12 @@ def genere_data(dataset,nb_pair_frames,ranger,selec):
             deplacement_bg=0
         else:
             deplacement_bg=2
-        # if (3<=random_bg<=4):
-        #     deplacement_bg=1
- 
-
-        # print("deplacement :",deplacement_bg)
         
-
         teta_bg=random.randint(0,360)
-        # print(teta_bg)
 
         deplacement_bg_x=int(np.cos(teta_bg*np.pi/180)*deplacement_bg)
         deplacement_bg_y=int(np.sin(teta_bg*np.pi/180)*deplacement_bg)
-        # print(deplacement_bg_x)
-        # print(deplacement_bg_y)
+
         flow=np.zeros((h,w,2))
         for i in range(w):
             for j in range(h):
@@ -168,25 +151,6 @@ def genere_data(dataset,nb_pair_frames,ranger,selec):
 
 
 
-
-def rotate2(teta):
-    frame1=np.zeros((720,1280,3))
-    im_met=cv2.imread(f'/Users/paul/Documents/MAIN4/Meteorix/gene_met/im_met/motif/met1.png')
-    
-    rotated = imutils.rotate_bound(im_met, 20)
-    h, w, couleurs = rotated.shape
-
-    # print(h,w)
-    for i in range(w):
-        for j in range(h):
-            if not np.array_equal(rotated[j, i], [0, 0, 0]):
-                frame1[j+200-int(h/2),i+200+int(w/2)]=rotated[j,i]
-
-    cv2.imwrite('test2.png',frame1)
-    return 0
-
-
-
 parser = argparse.ArgumentParser(
     description="PyTorch FlowNet inference on a folder of img pairs",
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -205,7 +169,7 @@ def main():
     global args, save_path
     args = parser.parse_args()
     print("génération de : ",args.nb_paires," paires")
-    genere_data("dataset_syn",args.nb_paires,1,51)
+    genere_data("dataset_syn",args.nb_paires,1)
     return(0)
 
 
