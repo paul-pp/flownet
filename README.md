@@ -1,4 +1,5 @@
-# FlowNet sur em780 (Python 3.12.3)
+# Utilisation de FlowNet sur em780 (Machine distante)
+FlowNet est un réseau de neurones convolutif (CNN) conçu pour estimer le flot optique, c’est-à-dire le déplacement apparent des pixels entre deux images successives. Il permet ainsi de détecter et de quantifier les mouvements dans une séquence vidéo, notamment pour le suivi d’objets, ou par exemple pour détecter le passage d'un météore.
 
 ## I. Installation du projet et des librairies
 
@@ -46,7 +47,7 @@ mv trained_model/ /scratch/<username>-nfs/code_source_pytorch/
 mv emtest /scratch/<username>-nfs/images_tests/
 ```
 
-### Création d’un environnement python et activation: (depuis /scratch/<username>-nfs/code_source_pytorch)
+### Création d’un environnement python (Python 3.12.3) et activation: (depuis /scratch/<username>-nfs/code_source_pytorch)
 
 - Création :
   ```bash
